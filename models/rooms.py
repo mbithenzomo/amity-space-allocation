@@ -1,23 +1,24 @@
 class Room(object):
     """
-    Creates a Room object. 
-    Classes Office and LivingSpace inherit from it.
+    Creates a Room object.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, room_type):
         """
-        Initializing the class with a name
+        Initializing the class with a name and type
         """
         self.name = name
-
-class Office(Room):
-    """
-    Creates an Office object.
-    """
-
-    def __init__(self):
-        self.capacity = 6 # set capacity of office space
+        self.room_type = room_type
         self.occupants = [] # create list of occupants
+
+    def set_capacity(self):
+        if self.room_type == "office":
+            self.capacity = 6 # set office capacity to 6
+        elif self.room_type == "livingspace":
+            self.capacity = 4 # set livingspace capacity to 4
+
+    def get_capacity():
+        return self.capacity
 
     def is_occupied():
         self.is_occupied = False # default value of is_occupied is False
@@ -28,30 +29,10 @@ class Office(Room):
 
     def assign_occupant(occupant):
         if  self.occupants < self.capacity:
-            self.occupants.append() # assign parameter as new occupant
-            self.is_occupied = True # sets is_occupied to True
+            self.occupants.append(occupant) # assign parameter as new occupant
         else:
-            print "Sorry, this office has reached its maximum capacity."
+            print "Sorry, this room has reached its maximum capacity."
 
-class LivingSpace(Room):
-    """
-    Creates a LivingSpace object.
-    """
-
-    def __init__(self):
-        self.capacity = 4 # set capacity of living space
-        self.occupants = [] # create list of occupants
-
-    def is_assigned():
-        self.is_occupied = False # default value of is_occupied is False
-        return self.is_occupied
-
-    def get_occupants():
-        return self.occupants # return list of occupants
-
-    def assign_occupant(occupant):
-        if  self.occupants < self.capacity:
-            self.occupants.append() # assign parameter as new occupant
-            self.is_occupied = True # sets is_occupied to True
-        else:
-            print "Sorry, this living space has reached its maximum capacity."
+    def set_occupied():
+        if len(self.occupants) > 0:
+            self.is_occupied = True # sets is_occupied to True if list of occupants is not empty
