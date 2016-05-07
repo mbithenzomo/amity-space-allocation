@@ -1,42 +1,69 @@
-class Room(object):
-    """
-    Creates a Room object.
-    """
+class Room():
+    '''
+    Creates a Room object. Classes Office and Living inherit from it
+    '''
 
-    def __init__(self, name, room_type):
-        """
-        Initializing the class with a name and type
-        """
-        self.name = name
-        self.room_type = room_type
-        self.occupants = [] # create list of occupants
-        if self.room_type == "Office":
-            self.capacity = 6 # set office capacity to 6
-        elif self.room_type == "Livingspace":
-            self.capacity = 4 # set livingspace capacity to 4
-        else:
-            print "Please select a valid room type. Your options are: 'Office' and 'Livingspace'."
+    def create_room(self, args):
+        ''' Creates new room(s) '''
 
-    def get_room_type(self):
-        return self.room_type    
+        room_type = "Living Space" if args["Living"] else "Office" # set room type
+        rooms = tuple((room, room_type) for room in args["<room_name>"]) # add rooms to tuple
 
-    def get_capacity(self):
-        return self.capacity
+        ''' Confirmation message '''
+        print "You have successfully added the following rooom(s):" 
+        for room in args["<room_name>"]:
+            print "Name: " + ''.join(room) + " | Type: " + room_type
 
-    def is_occupied(self):
-        self.is_occupied = False # default value of is_occupied is False
-        return self.is_occupied
-
-    def get_occupants(self):
-        return self.occupants # return list of occupants
-
-    def assign_occupant(occupant):
-        # if  self.occupants < self.capacity:
-        #     self.occupants.append(occupant) # assign parametecr as new occupant
-        # else:
-        #     print "Sorry, this room has reached its maximum capacity."
+    def view_allocations(self, args):
+        ''' Prints all room allocations '''
         pass
+        # fetch allocations data from db. Table with columns: NAME | ROOM TYPE | FULLY OCCUPIED | VACANCIES AVAILABLE 
 
-    def set_occupied(self):
-        if len(self.occupants) > 0:
-            self.is_occupied = True # sets is_occupied to True if list of occupants is not empty
+
+class Office(Room):
+
+    capacity = 6
+
+    def view_unallocated(self):
+        ''' Prints all offices with vacancies ''' 
+        pass
+        # fetch unallocated offices from db
+
+    def view_all_details(self):
+        ''' Prints details of all offices '''
+        pass
+        # view details of all offices. NAME | FULLY OCCUPIED (T/F) | VACANCIES AVAILABLE
+
+    def view_ind_details(self, office_id):
+        ''' Prints details of an individual office '''
+        pass
+        # view details of individual office
+
+    def allocate_office(self, staff_id, office_id):
+        ''' Allocates a staff member to an office '''
+        pass
+        # add person to office
+
+class Living(Room):
+
+    capacity = 4
+
+    def view_unallocated(self):
+        ''' Prints all living spaces with vacancies ''' 
+        pass
+        # fetch unallocated offices from db
+
+    def view_all_details(self):
+        ''' Prints details of all living spaces '''
+        pass
+        # view details of all offices. NAME | FULLY OCCUPIED (T/F) | VACANCIES AVAILABLE
+
+    def view_ind_details(self, lspace_id):
+        ''' Prints details of an individual living space '''
+        pass
+        # view details of individual office
+
+    def allocate_livingspace(self, fellow_id, lspace_id):
+        ''' Allocates a person to an living space '''
+        pass
+        # add person to office
