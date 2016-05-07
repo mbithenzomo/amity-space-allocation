@@ -1,24 +1,42 @@
 class Person(object):
-    """
-    Creates a Person object.
-    """
+    '''
+    Creates a Person object. Classes Fellow and Staff inherit from it.
+    '''
 
-    def __init__(self, fname, lname, job_type, wants_space="N"):
-        """
-        Initializing the class with a name
-        """
-        self.fname = fname
-        self.lname = lname
-        self.job_type = job_type
-        self.wants_space = wants_space
+    def add_person(self, args):
+        ''' Adds new person '''
 
-    def get_person_details(self):
-        self.details = self.fname, self.lname, self.job_type, self.wants_space
-        return self.details
+        name = args["<first_name>"] + " " + args["<last_name>"]
+        job_type = "Staff" if args["Staff"] else "Fellow" # set job type
+        wants_space = "Yes" if args["<wants_space>"] is "Y" else "No" # set wants_space
+        persons = tuple((name, job_type) for name in args["<first_name>"]) # add person to tuple
 
-    def get_job_type(self):
-        return self.job_type
-        
-    def is_assigned():
-        self.is_assigned = False # default value of is_assigned is False
-        return self.is_assigned
+        ''' Confirmation message '''
+        print "You have successfully added the following person:"
+        print "Name: " + name + " | Job Type: " + job_type + " | Wants Space?:"  + " " + wants_space
+
+class Staff(Person):
+
+    job_type = "Staff"
+
+    # def allocate_staff(self, staff_id):
+    #     if self.wants_space == "Y":
+    #         pass
+    #         # randomly allocate a room
+
+    # def reallocate(self, staff_id):
+    #     # reallocate room
+
+class Fellow(Person):
+
+    job_type = "Fellow"
+
+    # def allocate_fellow(self, fellow_id):
+    #     if self.wants_space = "Y":
+    #         # randomly allocate a room
+
+    # def reallocate(self, fellow_id):
+    #     # reallocate room
+
+
+
