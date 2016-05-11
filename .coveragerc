@@ -1,0 +1,10 @@
+[report]
+omit=
+    */python?.?/*
+    *site-packages/*
+    *site-packages/nose/*
+    *docopt.py*
+    *docopt*
+    *tests/*
+[html]
+directory = coverage_html
