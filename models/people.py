@@ -6,6 +6,9 @@ class Person(object):
         self.name = name
         self.emp_id = id(self)
 
+    def __repr__(self):
+        return "<Room %s>" % self.name
+
 
 class Staff(Person):
 
@@ -14,6 +17,9 @@ class Staff(Person):
     def __init__(self, name):
         super(Staff, self).__init__(name)
 
+    def __repr__(self):
+        return "<Staff %s>" % self.name
+
 
 class Fellow(Person):
 
@@ -21,3 +27,6 @@ class Fellow(Person):
 
     def __init__(self, name):
         super(Fellow, self).__init__(name)
+
+    def __repr__(self):
+        return "Fellow %s>" % self.name
