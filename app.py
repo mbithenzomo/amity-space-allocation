@@ -3,7 +3,7 @@
 Usage:
     amity create_room (Living|Office) <room_name>...
     amity add_person <first_name> <last_name> (Fellow|Staff) [<wants_space>]
-    amity reallocate_person <person_identifier> <new_room_name>
+    amity reallocate_person <employee_id> <new_room_name>
     amity load_people
     amity print_allocations [-o=filename]
     amity print_unallocated [-o=filename]
@@ -22,8 +22,11 @@ import sys
 import cmd
 from docopt import docopt, DocoptExit
 from models.amity import my_amity, spacer
-from models.rooms import Room
-from models.people import Person
+from colorama import init
+init(strip=not sys.stdout.isatty())
+from termcolor import cprint, colored
+from pyfiglet import figlet_format
+
 
 def docopt_cmd(func):
     """
@@ -53,40 +56,32 @@ def docopt_cmd(func):
     fn.__dict__.update(func.__dict__)
     return fn
 
+
 class Interactive (cmd.Cmd):
 
+    cprint(figlet_format('AMITY', font='univers'), 'cyan', attrs=['bold'])
 
     def introduction():
-
-
+        print "WELCOME TO AMITY SPACE ALLOCATION!".center(70)
         print spacer
-        print "        db         88b           d88  88  888888888888  8b        d8 ".center(80)
-        print "       d88b        888b         d888  88       88        Y8,    ,8P  ".center(80)
-        print "      d8``8b       88`8b       d8`88  88       88         Y8,  ,8P   ".center(80)
-        print "     d8`  `8b      88 `8b     d8` 88  88       88          `8aa8`    ".center(80)
-        print "    d8YaaaaY8b     88  `8b   d8`  88  88       88           `88`     ".center(80)
-        print "  d8`        `8b   88    `888`    88  88       88            88      ".center(80)
-        print " d8`          `8b  88     `8`     88  88       88            88      ".center(80)
+        print "ROOM ALLOCATION COMMANDS".center(70)
         print spacer
-        print "Welcome to Amity Space Allocation!".center(80)
+        print "1 - create_room (Living|Office) <room_name>...".center(70)
+        print "2 - add_person " \
+            "< first_name> <last_name> (Fellow|Staff) " \
+            "[<wants_space>]".center(70)
+        print "3 - reallocate_person <employee_id> <new_room_name>".center(70)
+        print "4 - load_people".center(70)
+        print "5 - print_allocations [-o=filename]".center(70)
+        print "6 - print_unallocated [-o=filename]".center(70)
+        print "6 - print_room <room_name>".center(70)
+        print "7 - save_state [--db=sqlite_database]".center(70)
+        print "8 - load_state <sqlite_database>".center(70)
         print spacer
-        print "ROOM ALLOCATION COMMANDS".center(80)
+        print "OTHER COMMANDS".center(70)
         print spacer
-        print "1 - create_room (Living|Office) <room_name>...".center(80)
-        print "2 - add_person <first_name> <last_name> (Fellow|Staff) [<wants_space>]".center(80)
-        print "3 - reallocate_person <person_identifier> <new_room_name>".center(80)
-        print "4 - load_people".center(80)
-        print "5 - print_allocations [-o=filename]".center(80)
-        print "6 - print_unallocated [-o=filename]".center(80)
-        print "6 - print_room <room_name>".center(80)
-        print "7 - save_state [--db=sqlite_database]".center(80)
-        print "8 - load_state <sqlite_database>".center(80)
-        print spacer
-        print "OTHER COMMANDS".center(80)
-        print spacer
-        print "1 - help".center(80)
-        print "2 - quit".center(80)
-        print "3 - exit".center(80)
+        print "1 - help".center(70)
+        print "2 - quit".center(70)
         print spacer
 
     intro = introduction()
@@ -101,8 +96,14 @@ class Interactive (cmd.Cmd):
 
     @docopt_cmd
     def do_add_person(self, args):
-        """Usage: add_person <first_name> <last_name> (Fellow|Staff) [<wants_space>]"""
+        """Usage: \
+        add_person <first_name> <last_name> (Fellow|Staff) [<wants_space>]"""
         my_amity.add_person(args)
+
+    @docopt_cmd
+    def do_reallocate_person(self, args):
+        """Usage: reallocate_person <employee_id> <new_room_name>"""
+        my_amity.reallocate_person(args)
 
     def do_quit(self, arg):
         """Quits out of the interactive mode"""

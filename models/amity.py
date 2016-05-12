@@ -1,8 +1,9 @@
 import random
 from rooms import Office, Living
 from people import Staff, Fellow
+from termcolor import colored
 
-spacer = "-" * 80
+spacer = colored("-" * 70, 'cyan')
 
 
 class Amity():
@@ -26,6 +27,7 @@ class Amity():
             if room.lower() in [r.name.lower() for r in self.rooms]:
                 print "One or more rooms you tried to create already exist! " \
                     "Please try again."
+                print spacer
                 return
             if args["Office"]:
                 new_room = Office(room)
@@ -65,7 +67,7 @@ class Amity():
         """Add new person"""
         print spacer
         self.name = args["<first_name>"] + " " + args["<last_name>"]
-        self.wants_space = "Yes" if args["<wants_space>"] is "Y" else "No"
+        self.wants_space = "Yes" if args.get("<wants_space>") is "Y" else "No"
         if args["Staff"]:
             if self.wants_space == "Yes":
                 if my_amity.offices:
@@ -73,20 +75,23 @@ class Amity():
                     if not self.vacant_offices:
                         print "There are no vacant offices at this time."
                         print "Please try again later."
+                        print spacer
                         return
                     office_choice = random.choice(self.vacant_offices)
                     self.new_person = Staff(self.name)
                     office_choice.occupants.append(self.new_person)
                     self.staff.append(self.new_person)
+                    self.assigned_staff.append(self.new_person)
                     my_amity.success_added_person()
                     print "You have successfully allocated " + self.name + \
                         " of Employee ID " + str(self.new_person.emp_id) + \
-                        "\n to the following office: " + office_choice.name
+                        "\nto the following office: " + office_choice.name
                     print spacer
                 else:
                     print "There are no offices in the system."
                     print "Add an office using the create_room command " \
                         "and try again."
+                    print spacer
                     return
             else:
                 self.new_person = Staff(self.name)
@@ -99,11 +104,13 @@ class Amity():
                     if not self.vacant_livingspaces:
                         print "There are no vacant living spaces at this time."
                         print "Please try again later."
+                        print spacer
                         return
                     living_choice = random.choice(self.vacant_livingspaces)
                     self.new_person = Fellow(self.name)
                     living_choice.occupants.append(self.new_person)
                     self.fellows.append(self.new_person)
+                    self.assigned_fellows.append(self.new_person)
                     my_amity.success_added_person()
                     print "You have successfully allocated " + self.name + \
                         " of Employee ID " + str(self.new_person.emp_id) + \
@@ -114,6 +121,7 @@ class Amity():
                     print "There are no living spaces in the system."
                     print "Add a living space using the create_room command " \
                         "and try again."
+                    print spacer
                     return
             else:
                 self.new_person = Fellow(self.name)
@@ -123,11 +131,15 @@ class Amity():
 
     def success_added_person(self):
         """Success message when person has been successfully added"""
+        print spacer
         print "You have successfully added the following person:"
         print "Name: " + self.name + " | Employee ID: " + \
             str(self.new_person.emp_id) + \
             "\nJob Type: " + self.new_person.job_type + \
             " | Wants Space?: " + self.wants_space
         print spacer
+
+    def reallocate_person(self, args):
+        """Reallocate person to another room"""
 
 my_amity = Amity()
