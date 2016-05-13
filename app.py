@@ -20,12 +20,12 @@ Options:
 
 import sys
 import cmd
+from termcolor import cprint
+from pyfiglet import figlet_format
 from docopt import docopt, DocoptExit
 from models.amity import my_amity, spacer
 from colorama import init
 init(strip=not sys.stdout.isatty())
-from termcolor import cprint, colored
-from pyfiglet import figlet_format
 
 
 def docopt_cmd(func):
@@ -107,8 +107,9 @@ class Interactive (cmd.Cmd):
 
     def do_quit(self, arg):
         """Quits out of the interactive mode"""
-
+        print spacer
         print "Goodbye!"
+        print spacer
         exit()
 
 opt = docopt(__doc__, sys.argv[1:])
