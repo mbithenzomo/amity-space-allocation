@@ -1,4 +1,5 @@
 import random
+import tkFileDialog as tk
 from rooms import Office, Living
 from people import Staff, Fellow
 from termcolor import colored
@@ -262,5 +263,35 @@ class Amity():
                     " of Employee ID " + str(new_person.emp_id) + \
                     "\nthe following living space: " + new_room.name
         print spacer
+
+    def load_people(self, args):
+        """Add people to rooms from a txt file"""
+        file = tk.askopenfile()
+
+        with open(file.name, 'r') as my_file:
+            people = my_file.readlines()
+            for p in people:
+                p = p.split()
+                first_name = p[0]
+                last_name = p[1]
+                if p[2] == "FELLOW":
+                    is_staff = False
+                    is_fellow = True
+                else:
+                    is_staff = True
+                    is_fellow = False
+                if len(p) == 4:
+                    wants_space = p[3]
+                else:
+                    wants_space = None
+
+                self.add_person({
+                        "<first_name>": first_name,
+                        "<last_name>": last_name,
+                        "<wants_space>": wants_space,
+                        "Fellow": is_fellow,
+                        "Staff": is_staff
+                    })
+
 
 my_amity = Amity()

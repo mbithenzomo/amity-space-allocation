@@ -105,6 +105,11 @@ class Interactive (cmd.Cmd):
         """Usage: reallocate_person <employee_id> <new_room_name>"""
         my_amity.reallocate_person(args)
 
+    @docopt_cmd
+    def do_load_people(self, args):
+        """Usage: load_people"""
+        my_amity.load_people(args)
+
     def do_quit(self, arg):
         """Quits out of the interactive mode"""
         print spacer
