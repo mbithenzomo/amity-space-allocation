@@ -272,26 +272,27 @@ class Amity():
             people = my_file.readlines()
             for p in people:
                 p = p.split()
-                first_name = p[0]
-                last_name = p[1]
-                if p[2] == "FELLOW":
-                    is_staff = False
-                    is_fellow = True
-                else:
-                    is_staff = True
-                    is_fellow = False
-                if len(p) == 4:
-                    wants_space = p[3]
-                else:
-                    wants_space = None
+                if p:
+                    first_name = p[0]
+                    last_name = p[1]
+                    if p[2] == "FELLOW":
+                        is_staff = False
+                        is_fellow = True
+                    else:
+                        is_staff = True
+                        is_fellow = False
+                    if len(p) == 4:
+                        wants_space = p[3]
+                    else:
+                        wants_space = None
 
-                self.add_person({
-                        "<first_name>": first_name,
-                        "<last_name>": last_name,
-                        "<wants_space>": wants_space,
-                        "Fellow": is_fellow,
-                        "Staff": is_staff
-                    })
+                    self.add_person({
+                            "<first_name>": first_name,
+                            "<last_name>": last_name,
+                            "<wants_space>": wants_space,
+                            "Fellow": is_fellow,
+                            "Staff": is_staff
+                        })
 
 
 my_amity = Amity()
