@@ -4,10 +4,11 @@ from rooms import Office, Living
 from people import Staff, Fellow
 from termcolor import colored
 
-spacer = colored("-" * 70, 'cyan')
+spacer = " "
+border = colored("*" * 5, 'cyan').center(80)
 
 
-class Amity():
+class Amity(object):
     def __init__(self):
         self.rooms = []
         self.vacant_rooms = []
@@ -16,10 +17,12 @@ class Amity():
         self.livingspaces = []
         self.vacant_livingspaces = []
         self.people = []
+        self.allocated_people = []
+        self.unallocated_people = []
         self.fellows = []
-        self.assigned_fellows = []
+        self.allocated_fellows = []
         self.staff = []
-        self.assigned_staff = []
+        self.allocated_staff = []
 
     def create_room(self, args):
         """Create new room(s)"""
@@ -89,7 +92,8 @@ class Amity():
                     self.new_person = Staff(self.name)
                     office_choice.occupants.append(self.new_person)
                     self.staff.append(self.new_person)
-                    self.assigned_staff.append(self.new_person)
+                    self.allocated_staff.append(self.new_person)
+                    self.allocated_people.append(self.new_person)
                     my_amity.success_added_person()
                     print "You have successfully allocated " + self.name + \
                         " of Employee ID " + str(self.new_person.emp_id) + \
@@ -118,7 +122,8 @@ class Amity():
                     self.new_person = Fellow(self.name)
                     living_choice.occupants.append(self.new_person)
                     self.fellows.append(self.new_person)
-                    self.assigned_fellows.append(self.new_person)
+                    self.allocated_fellows.append(self.new_person)
+                    self.allocated_people.append(self.new_person)
                     my_amity.success_added_person()
                     print "You have successfully allocated " + self.name + \
                         " of Employee ID " + str(self.new_person.emp_id) + \
@@ -208,6 +213,8 @@ class Amity():
                             office.occupants.remove(new_person)
                 """Add staff member to new office"""
                 new_room.occupants.append(new_person)
+                self.allocated_staff.append(new_person)
+                self.allocated_people.append(new_person)
                 print "You have successfully allocated " + new_person.name + \
                     " of Employee ID " + str(new_person.emp_id) + \
                     "\nthe following office: " + new_room.name
@@ -234,6 +241,8 @@ class Amity():
                             office.occupants.remove(new_person)
                 """Add fellow to new office"""
                 new_room.occupants.append(new_person)
+                self.allocated_fellows.append(new_person)
+                self.allocated_people.append(new_person)
                 print "You have successfully allocated " + new_person.name + \
                     " of Employee ID " + str(new_person.emp_id) + \
                     "\nthe following office: " + new_room.name
@@ -259,15 +268,17 @@ class Amity():
                             livingspace.occupants.remove(new_person)
                 """Add fellow to new living space"""
                 new_room.occupants.append(new_person)
+                self.allocated_fellows.append(new_person)
+                self.allocated_people.append(new_person)
                 print "You have successfully allocated " + new_person.name + \
                     " of Employee ID " + str(new_person.emp_id) + \
                     "\nthe following living space: " + new_room.name
+        self.unallocated_people.remove(new_person)
         print spacer
 
     def load_people(self, args):
         """Add people to rooms from a txt file"""
         file = tk.askopenfile()
-
         with open(file.name, 'r') as my_file:
             people = my_file.readlines()
             for p in people:
@@ -287,12 +298,60 @@ class Amity():
                         wants_space = None
 
                     self.add_person({
-                            "<first_name>": first_name,
-                            "<last_name>": last_name,
+                            "<first_name>": first_name.title(),
+                            "<last_name>": last_name.title(),
                             "<wants_space>": wants_space,
                             "Fellow": is_fellow,
                             "Staff": is_staff
                         })
 
+    def print_allocations(self, args):
+        """Print list of occupants per room to the  \
+        screen and optionally to a text file"""
+        for r in self.rooms:
+            if r.occupants:
+                print spacer
+                print r.name
+                print "-" * 50
+                print ', '.join(p.name for p in r.occupants)
+                print spacer
+            else:
+                print "This room has no occupants."
+
+    def print_unallocated(self, args):
+        """Print list of unallocated people to the \
+        screen and optionally to a text file"""
+        print spacer
+        print "Unallocated People"
+        print "-" * 50
+        for p in self.people:
+            if p not in self.allocated_people:
+                print p.name
+                if p not in self.unallocated_people:
+                    self.unallocated_people.append(p)
+        if not self.unallocated_people:
+            print "There are no unallocated people in the system."
+        print spacer
+
+    def print_room(self, args):
+        """Print the names of all the people in room_name on the screen"""
+        print spacer
+        room_name = args["<room_name>"]
+        if room_name not in [r.name for r in self.rooms]:
+            print "The room you have entered does not exist."
+            print "Please try again."
+            print spacer
+            return
+        for r in self.rooms:
+            if r.name == room_name:
+                room = r
+                print room.name
+                print "-" * 50
+                if room.occupants:
+                    for p in room.occupants:
+                        print p.name
+                else:
+                    print "This room has no occupants at this time."
+                print spacer
 
 my_amity = Amity()

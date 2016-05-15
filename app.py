@@ -23,7 +23,7 @@ import cmd
 from termcolor import cprint
 from pyfiglet import figlet_format
 from docopt import docopt, DocoptExit
-from models.amity import my_amity, spacer
+from models.amity import my_amity, spacer, border
 from colorama import init
 init(strip=not sys.stdout.isatty())
 
@@ -62,27 +62,30 @@ class Interactive (cmd.Cmd):
     cprint(figlet_format('AMITY', font='univers'), 'cyan', attrs=['bold'])
 
     def introduction():
+        print border
+        print spacer
         print "WELCOME TO AMITY SPACE ALLOCATION!".center(70)
         print spacer
-        print "ROOM ALLOCATION COMMANDS".center(70)
+        print "ROOM ALLOCATION COMMANDS:".center(70)
         print spacer
-        print "1 - create_room (Living|Office) <room_name>...".center(70)
-        print "2 - add_person " \
+        print "1. create_room (Living|Office) <room_name>...".center(70)
+        print "2. add_person " \
             "< first_name> <last_name> (Fellow|Staff) " \
             "[<wants_space>]".center(70)
-        print "3 - reallocate_person <employee_id> <new_room_name>".center(70)
-        print "4 - load_people".center(70)
-        print "5 - print_allocations [-o=filename]".center(70)
-        print "6 - print_unallocated [-o=filename]".center(70)
-        print "6 - print_room <room_name>".center(70)
-        print "7 - save_state [--db=sqlite_database]".center(70)
-        print "8 - load_state <sqlite_database>".center(70)
+        print "3. reallocate_person <employee_id> <new_room_name>".center(70)
+        print "4. load_people".center(70)
+        print "5. print_allocations [-o=filename]".center(70)
+        print "6. print_unallocated [-o=filename]".center(70)
+        print "7. print_room <room_name>".center(70)
+        print "8. save_state [--db=sqlite_database]".center(70)
+        print "9. load_state <sqlite_database>".center(70)
         print spacer
-        print "OTHER COMMANDS".center(70)
+        print "OTHER COMMANDS:".center(70)
         print spacer
-        print "1 - help".center(70)
-        print "2 - quit".center(70)
+        print "1. help".center(70)
+        print "2. quit".center(70)
         print spacer
+        print border
 
     intro = introduction()
     prompt = "(amity) "
@@ -109,6 +112,21 @@ class Interactive (cmd.Cmd):
     def do_load_people(self, args):
         """Usage: load_people"""
         my_amity.load_people(args)
+
+    @docopt_cmd
+    def do_print_allocations(self, args):
+        """Usage: print_allocations [-o=filename]"""
+        my_amity.print_allocations(args)
+
+    @docopt_cmd
+    def do_print_unallocated(self, args):
+        """Usage: print_unallocated [-o=filename]"""
+        my_amity.print_unallocated(args)
+
+    @docopt_cmd
+    def do_print_room(self, args):
+        """Usage: print_room <room_name>"""
+        my_amity.print_room(args)
 
     def do_quit(self, arg):
         """Quits out of the interactive mode"""
