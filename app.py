@@ -5,8 +5,8 @@ Usage:
     amity add_person <first_name> <last_name> (Fellow|Staff) [<wants_space>]
     amity reallocate_person <employee_id> <new_room_name>
     amity load_people
-    amity print_allocations [-o=filename]
-    amity print_unallocated [-o=filename]
+    amity print_allocations [--o=filename.txt]
+    amity print_unallocated [--o=filename.txt]
     amity print_room <room_name>
     amity save_state [--db=sqlite_database]
     amity load_state <sqlite_database>
@@ -24,6 +24,7 @@ from termcolor import cprint
 from pyfiglet import figlet_format
 from docopt import docopt, DocoptExit
 from models.amity import my_amity, spacer, border
+from db.database import my_database
 from colorama import init
 init(strip=not sys.stdout.isatty())
 
@@ -74,8 +75,8 @@ class Interactive (cmd.Cmd):
             "[<wants_space>]".center(70)
         print "3. reallocate_person <employee_id> <new_room_name>".center(70)
         print "4. load_people".center(70)
-        print "5. print_allocations [-o=filename]".center(70)
-        print "6. print_unallocated [-o=filename]".center(70)
+        print "5. print_allocations [--o=filename.txt]".center(70)
+        print "6. print_unallocated [--o=filename.txt]".center(70)
         print "7. print_room <room_name>".center(70)
         print "8. save_state [--db=sqlite_database]".center(70)
         print "9. load_state <sqlite_database>".center(70)
@@ -115,18 +116,28 @@ class Interactive (cmd.Cmd):
 
     @docopt_cmd
     def do_print_allocations(self, args):
-        """Usage: print_allocations [-o=filename]"""
+        """Usage: print_allocations [--o=filename.txt]"""
         my_amity.print_allocations(args)
 
     @docopt_cmd
     def do_print_unallocated(self, args):
-        """Usage: print_unallocated [-o=filename]"""
+        """Usage: print_unallocated [--o=filename.txt]"""
         my_amity.print_unallocated(args)
 
     @docopt_cmd
     def do_print_room(self, args):
         """Usage: print_room <room_name>"""
         my_amity.print_room(args)
+
+    @docopt_cmd
+    def do_save_state(self, args):
+        """Usage: save_state [--db=sqlite_database]"""
+        my_database.save_state(args)
+
+    @docopt_cmd
+    def do_load_state(self, args):
+        """Usage: load_state <sqlite_database>"""
+        my_database.load_state(args)
 
     def do_quit(self, arg):
         """Quits out of the interactive mode"""
