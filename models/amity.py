@@ -1,4 +1,5 @@
 import random
+import sys
 import tkFileDialog as tk
 from rooms import Office, Living
 from people import Staff, Fellow
@@ -308,15 +309,29 @@ class Amity(object):
     def print_allocations(self, args):
         """Print list of occupants per room to the  \
         screen and optionally to a text file"""
+        print spacer
+        output = ""
         for r in self.rooms:
+            output += r.name + "\n"
+            output += "-" * 50 + "\n"
             if r.occupants:
-                print spacer
-                print r.name
-                print "-" * 50
-                print ', '.join(p.name for p in r.occupants)
-                print spacer
+                output += ", ".join(p.name for p in r.occupants) + "\n"
+                output += spacer + "\n"
             else:
-                print "This room has no occupants."
+                output += "This room has no occupants.\n"
+                output += spacer + "\n"
+        if not self.rooms:
+            output += "There are no rooms in the system.\n"
+            output += "Add a room using the create_room command" \
+                "and try again.\n"
+        print output
+        if args['--o']:
+            with open(args['--o'], 'wt') as f:
+                f.write(output)
+                print "The list of allocations has been saved " \
+                    "to the following file: "
+                print args['--o']
+                print spacer
 
     def print_unallocated(self, args):
         """Print list of unallocated people to the \
@@ -351,7 +366,13 @@ class Amity(object):
                     for p in room.occupants:
                         print p.name
                 else:
-                    print "This room has no occupants at this time."
+                    print "This room has no occupants."
                 print spacer
+
+    def save_state(self, args):
+        pass
+
+    def load_state(self, args):
+        pass
 
 my_amity = Amity()
