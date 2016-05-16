@@ -323,7 +323,7 @@ class Amity(object):
         if not self.rooms:
             output += "There are no rooms in the system.\n"
             output += "Add a room using the create_room command" \
-                "and try again.\n"
+                " and try again.\n"
         print output
         if args['--o']:
             with open(args['--o'], 'wt') as f:
@@ -337,16 +337,28 @@ class Amity(object):
         """Print list of unallocated people to the \
         screen and optionally to a text file"""
         print spacer
-        print "Unallocated People"
-        print "-" * 50
+        output = ""
+        output += "Unallocated People\n"
+        output += "-" * 50 + "\n"
         for p in self.people:
             if p not in self.allocated_people:
-                print p.name
+                output += p.name + "\n"
                 if p not in self.unallocated_people:
                     self.unallocated_people.append(p)
-        if not self.unallocated_people:
-            print "There are no unallocated people in the system."
-        print spacer
+        if not self.people:
+            output += "There are no people in the system.\n"
+            output += "Add a person using the add_person command" \
+                " and try again.\n"
+        elif not self.unallocated_people:
+            output += "There are no unallocated people in the system.\n"
+        print output
+        if args['--o']:
+            with open(args['--o'], 'wt') as f:
+                f.write(output)
+                print "The list of unallocated people has been saved " \
+                    "to the following file: "
+                print args['--o']
+                print spacer
 
     def print_room(self, args):
         """Print the names of all the people in room_name on the screen"""
