@@ -23,7 +23,8 @@ import cmd
 from termcolor import cprint
 from pyfiglet import figlet_format
 from docopt import docopt, DocoptExit
-from models.amity import my_amity, spacer, border
+from models import my_amity
+from models.amity import spacer, border
 from db.database import my_database
 from colorama import init
 init(strip=not sys.stdout.isatty())

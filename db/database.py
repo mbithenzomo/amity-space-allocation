@@ -1,4 +1,5 @@
-from models.amity import my_amity, spacer
+from models import my_amity
+from models.amity import spacer
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData, Column, Table
 from sqlalchemy import Integer, String, Boolean, ForeignKey
@@ -31,9 +32,6 @@ class Database(object):
         else:
             print "amity.db"
         print spacer
-
-    def load_state(self, args):
-        pass
 
     def add_people(self):
         """Add data from the People list to the database"""
@@ -127,5 +125,8 @@ class Database(object):
                             employee_id=person.emp_id,
                             name=person.name
                         )
+
+    def load_state(self, args):
+        pass
 
 my_database = Database()

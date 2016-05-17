@@ -1,5 +1,4 @@
 import random
-import sys
 import tkFileDialog as tk
 from rooms import Office, Living
 from people import Staff, Fellow
@@ -53,7 +52,7 @@ class Amity(object):
 
     def check_vacant_offices(self):
         """Add vacant offices to lists; remove full ones from lists"""
-        for office in my_amity.offices:
+        for office in self.offices:
             if len(office.occupants) < office.capacity:
                 if office not in self.vacant_offices:
                     self.vacant_offices.append(office)
@@ -65,7 +64,7 @@ class Amity(object):
 
     def check_vacant_livingspaces(self):
         """Add vacant living spaces to lists; remove full ones from lists"""
-        for livingspace in my_amity.livingspaces:
+        for livingspace in self.livingspaces:
             if len(livingspace.occupants) < livingspace.capacity:
                 if livingspace not in self.vacant_livingspaces:
                     self.vacant_livingspaces.append(livingspace)
@@ -78,26 +77,26 @@ class Amity(object):
     def add_person(self, args):
         """Add new person"""
         print spacer
-        self.name = args["<first_name>"] + " " + args["<last_name>"]
-        self.wants_space = "Yes" if args.get("<wants_space>") is "Y" else "No"
+        name = args["<first_name>"] + " " + args["<last_name>"]
+        wants_space = "Yes" if args.get("<wants_space>") is "Y" else "No"
         if args["Staff"]:
-            if self.wants_space == "Yes":
-                if my_amity.offices:
-                    my_amity.check_vacant_offices()
+            if wants_space == "Yes":
+                if self.offices:
+                    self.check_vacant_offices()
                     if not self.vacant_offices:
                         print "There are no vacant offices at this time."
                         print "Please try again later."
                         print spacer
                         return
                     office_choice = random.choice(self.vacant_offices)
-                    self.new_person = Staff(self.name)
-                    office_choice.occupants.append(self.new_person)
-                    self.staff.append(self.new_person)
-                    self.allocated_staff.append(self.new_person)
-                    self.allocated_people.append(self.new_person)
-                    my_amity.success_added_person()
-                    print "You have successfully allocated " + self.name + \
-                        " of Employee ID " + str(self.new_person.emp_id) + \
+                    new_person = Staff(name)
+                    office_choice.occupants.append(new_person)
+                    self.staff.append(new_person)
+                    self.allocated_staff.append(new_person)
+                    self.allocated_people.append(new_person)
+                    self.success_added_person(new_person, wants_space)
+                    print "You have successfully allocated " + name + \
+                        " of Employee ID " + str(new_person.emp_id) + \
                         "\nthe following office: " + office_choice.name
                     print spacer
                 else:
@@ -107,27 +106,27 @@ class Amity(object):
                     print spacer
                     return
             else:
-                self.new_person = Staff(self.name)
-                my_amity.success_added_person()
-            self.staff.append(self.new_person)
+                new_person = Staff(name)
+                self.success_added_person(new_person, wants_space)
+                self.staff.append(new_person)
         elif args["Fellow"]:
-            if self.wants_space == "Yes":
-                if my_amity.livingspaces:
-                    my_amity.check_vacant_livingspaces()
+            if wants_space == "Yes":
+                if self.livingspaces:
+                    self.check_vacant_livingspaces()
                     if not self.vacant_livingspaces:
                         print "There are no vacant living spaces at this time."
                         print "Please try again later."
                         print spacer
                         return
                     living_choice = random.choice(self.vacant_livingspaces)
-                    self.new_person = Fellow(self.name)
-                    living_choice.occupants.append(self.new_person)
-                    self.fellows.append(self.new_person)
-                    self.allocated_fellows.append(self.new_person)
-                    self.allocated_people.append(self.new_person)
-                    my_amity.success_added_person()
-                    print "You have successfully allocated " + self.name + \
-                        " of Employee ID " + str(self.new_person.emp_id) + \
+                    new_person = Fellow(name)
+                    living_choice.occupants.append(new_person)
+                    self.fellows.append(new_person)
+                    self.allocated_fellows.append(new_person)
+                    self.allocated_people.append(new_person)
+                    self.success_added_person(new_person, wants_space)
+                    print "You have successfully allocated " + name + \
+                        " of Employee ID " + str(new_person.emp_id) + \
                         "\nthe following living space: " + \
                         living_choice.name
                     print spacer
@@ -138,18 +137,18 @@ class Amity(object):
                     print spacer
                     return
             else:
-                self.new_person = Fellow(self.name)
-                my_amity.success_added_person()
-            self.fellows.append(self.new_person)
-        self.people.append(self.new_person)
+                new_person = Fellow(name)
+                self.success_added_person(new_person, wants_space)
+                self.fellows.append(new_person)
+        self.people.append(new_person)
 
-    def success_added_person(self):
+    def success_added_person(self, new_person, wants_space):
         """Success message when person has been successfully added"""
         print "You have successfully added the following person:"
-        print "Name: " + self.name + " | Employee ID: " + \
-            str(self.new_person.emp_id) + \
-            "\nJob Type: " + self.new_person.job_type + \
-            " | Wants Space?: " + self.wants_space
+        print "Name: " + new_person.name + " | Employee ID: " + \
+            str(new_person.emp_id) + \
+            "\nJob Type: " + new_person.job_type + \
+            " | Wants Space?: " + wants_space
         print spacer
 
     def reallocate_person(self, args):
@@ -274,7 +273,8 @@ class Amity(object):
                 print "You have successfully allocated " + new_person.name + \
                     " of Employee ID " + str(new_person.emp_id) + \
                     "\nthe following living space: " + new_room.name
-        self.unallocated_people.remove(new_person)
+        if new_person in self.unallocated_people:
+            self.unallocated_people.remove(new_person)
         print spacer
 
     def load_people(self, args):
@@ -325,12 +325,12 @@ class Amity(object):
             output += "Add a room using the create_room command" \
                 " and try again.\n"
         print output
-        if args['--o']:
-            with open(args['--o'], 'wt') as f:
+        if args["--o"]:
+            with open(args["--o"], 'wt') as f:
                 f.write(output)
                 print "The list of allocations has been saved " \
                     "to the following file: "
-                print args['--o']
+                print args["--o"]
                 print spacer
 
     def print_unallocated(self, args):
@@ -352,12 +352,12 @@ class Amity(object):
         elif not self.unallocated_people:
             output += "There are no unallocated people in the system.\n"
         print output
-        if args['--o']:
-            with open(args['--o'], 'wt') as f:
+        if args["--o"]:
+            with open(args["--o"], 'wt') as f:
                 f.write(output)
                 print "The list of unallocated people has been saved " \
                     "to the following file: "
-                print args['--o']
+                print args["--o"]
                 print spacer
 
     def print_room(self, args):
@@ -380,11 +380,3 @@ class Amity(object):
                 else:
                     print "This room has no occupants."
                 print spacer
-
-    def save_state(self, args):
-        pass
-
-    def load_state(self, args):
-        pass
-
-my_amity = Amity()
