@@ -1,7 +1,7 @@
 from models.amity import my_amity, spacer
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData, Column, Table
-from sqlalchemy import Integer, String, Boolean
+from sqlalchemy import Integer, String, Boolean, ForeignKey
 
 
 class Database(object):
@@ -10,11 +10,11 @@ class Database(object):
 
     def save_state(self, args):
         """
-        Save all application data to the database 'amity.db', or
-        optionally, a user-defined name
+        Save all application data to the database 'amity.db',
+        or optionally, a user-defined database
         """
         if args["--db"]:
-            self.db_name = str("sqlite:///" + "%s" % (args["--db"]))
+            self.db_name = "sqlite:///" + "%s" % (args["--db"])
             self.db = create_engine(self.db_name)
         else:
             self.db = create_engine("sqlite:///amity.db")
@@ -23,6 +23,7 @@ class Database(object):
 
         self.add_people()
         self.add_rooms()
+        self.add_allocations()
         print spacer
         print "Application data has been stored in the following database: "
         if args["--db"]:
@@ -35,12 +36,13 @@ class Database(object):
         pass
 
     def add_people(self):
+        """Add data from the People list to the database"""
         people = Table(
-                'people', self.metadata,
-                Column('employee_id', Integer, primary_key=True),
-                Column('name', String(80)),
-                Column('is_fellow', Boolean),
-                Column('is_allocated', Boolean),
+                "people", self.metadata,
+                Column("employee_id", Integer, primary_key=True),
+                Column("name", String(80)),
+                Column("is_fellow", Boolean),
+                Column("is_allocated", Boolean),
                 extend_existing=True
         )
         if people.exists():
@@ -67,11 +69,12 @@ class Database(object):
                 self.already_added.append(person)
 
     def add_rooms(self):
+        """Add data from the Rooms list to the database"""
         rooms = Table(
-                'rooms', self.metadata,
-                Column('name', String, primary_key=True),
-                Column('is_office', Boolean),
-                Column('is_vacant', Boolean),
+                "rooms", self.metadata,
+                Column("name", String, primary_key=True),
+                Column("is_office", Boolean),
+                Column("is_vacant", Boolean),
                 extend_existing=True
         )
         if rooms.exists():
@@ -95,5 +98,34 @@ class Database(object):
                     is_vacant=is_vacant
                 )
                 self.already_added.append(room)
+
+    def add_allocations(self):
+        """
+        Add data from the Allocations list to the database.
+        Each room gets a database table with occupants as rows.
+        """
+        if my_amity.rooms:
+            for room in my_amity.rooms:
+                room_name = room.name
+                room_name = Table(
+                        room_name, self.metadata,
+                        Column(
+                            "employee_id", Integer,
+                            ForeignKey("people.employee_id"),
+                            nullable=False),
+                        Column("name", String),
+                        extend_existing=True
+                )
+                if room_name.exists():
+                    room_name.update()
+                else:
+                    room_name.create()
+                i = room_name.insert()
+                if room.occupants:
+                    for person in room.occupants:
+                        i.execute(
+                            employee_id=person.emp_id,
+                            name=person.name
+                        )
 
 my_database = Database()
