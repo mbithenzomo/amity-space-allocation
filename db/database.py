@@ -3,21 +3,40 @@ from sqlalchemy import create_engine
 from sqlalchemy import MetaData, Column, Table
 from sqlalchemy import Integer, String, Boolean
 
-db = create_engine('sqlite:///amity.db')
-
-db.echo = False
-
-
-metadata = MetaData(bind=db)
-
 
 class Database(object):
 
     already_added = []
 
+    def save_state(self, args):
+        """
+        Save all application data to the database 'amity.db', or
+        optionally, a user-defined name
+        """
+        if args["--db"]:
+            self.db_name = str("sqlite:///" + "%s" % (args["--db"]))
+            self.db = create_engine(self.db_name)
+        else:
+            self.db = create_engine("sqlite:///amity.db")
+        self.db.echo = False
+        self.metadata = MetaData(bind=self.db)
+
+        self.add_people()
+        self.add_rooms()
+        print spacer
+        print "Application data has been stored in the following database: "
+        if args["--db"]:
+            print args["--db"]
+        else:
+            print "amity.db"
+        print spacer
+
+    def load_state(self, args):
+        pass
+
     def add_people(self):
         people = Table(
-                'people', metadata,
+                'people', self.metadata,
                 Column('employee_id', Integer, primary_key=True),
                 Column('name', String(80)),
                 Column('is_fellow', Boolean),
@@ -49,7 +68,7 @@ class Database(object):
 
     def add_rooms(self):
         rooms = Table(
-                'rooms', metadata,
+                'rooms', self.metadata,
                 Column('name', String, primary_key=True),
                 Column('is_office', Boolean),
                 Column('is_vacant', Boolean),
@@ -76,22 +95,5 @@ class Database(object):
                     is_vacant=is_vacant
                 )
                 self.already_added.append(room)
-        print self.already_added
-
-    def save_state(self, args):
-        # if args['--db']:
-        #     db = create_engine('sqlite:///%s') % (args['--db'])
-        self.add_people()
-        self.add_rooms()
-        print spacer
-        print "Application data has been stored in the following database: "
-        if args['--db']:
-            print args['--db']
-        else:
-            print "amity.db"
-        print spacer
-
-    def load_state(self, args):
-        pass
 
 my_database = Database()
