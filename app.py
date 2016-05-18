@@ -4,7 +4,7 @@ Usage:
     amity create_room (Living|Office) <room_name>...
     amity add_person <first_name> <last_name> (Fellow|Staff) [<wants_space>]
     amity reallocate_person <employee_id> <new_room_name>
-    amity load_people
+    amity load_people <filename>
     amity print_allocations [--o=filename.txt]
     amity print_unallocated [--o=filename.txt]
     amity print_room <room_name>
@@ -25,7 +25,7 @@ from pyfiglet import figlet_format
 from docopt import docopt, DocoptExit
 from models import my_amity
 from models.amity import spacer, border
-from db.database import my_database
+from db import my_database
 from colorama import init
 init(strip=not sys.stdout.isatty())
 
@@ -75,7 +75,7 @@ class Interactive (cmd.Cmd):
             "< first_name> <last_name> (Fellow|Staff) " \
             "[<wants_space>]".center(70)
         print "3. reallocate_person <employee_id> <new_room_name>".center(70)
-        print "4. load_people".center(70)
+        print "4. load_people <filename>".center(70)
         print "5. print_allocations [--o=filename.txt]".center(70)
         print "6. print_unallocated [--o=filename.txt]".center(70)
         print "7. print_room <room_name>".center(70)
