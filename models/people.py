@@ -32,3 +32,29 @@ class Fellow(Person):
 
     def __repr__(self):
         return "Fellow %s>" % self.name
+
+
+class StaffFromDatabase(Person):
+
+    job_type = "Staff"
+
+    def __init__(self, is_fellow, first_name, last_name, emp_id):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.emp_id = emp_id
+
+    def __repr__(self):
+        return "<Staff %s>" % self.name
+
+
+class FellowFromDatabase(Person):
+
+    job_type = "Fellow"
+
+    def __init__(self, is_fellow, first_name, last_name, emp_id):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.emp_id = emp_id
+
+    def __repr__(self):
+        return "<Fellow %s>" % self.name
