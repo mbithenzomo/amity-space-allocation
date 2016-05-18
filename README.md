@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/andela-mnzomo/amity-space-allocation.svg?branch=features-review)](https://travis-ci.org/andela-mnzomo/amity-space-allocation)
-[![Coverage Status](https://coveralls.io/repos/github/andela-mnzomo/amity-space-allocation/badge.svg?branch=master)](https://coveralls.io/github/andela-mnzomo/amity-space-allocation?branch=master)
-[![Software License][ico-license]](https://github.com/andela-mnzomo/amity-space-allocation)
+[![Coverage Status](https://coveralls.io/repos/github/andela-mnzomo/amity-space-allocation/badge.svg?branch=features-review)](https://coveralls.io/github/andela-mnzomo/amity-space-allocation?branch=features-review)
 
 # Amity Space Allocation
 A Python console application for allocating office and living spaces in Amity.
