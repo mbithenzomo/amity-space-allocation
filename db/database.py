@@ -134,7 +134,7 @@ class Database(object):
 
     def load_state(self, args):
         """Load data to the application from a user-defined database"""
-        self.db_name = "sqlite:///" + "%s" % (args["<sqlite_database>"])
+        self.db_name = "sqlite:///" + "%s" % args.get("<sqlite_database>")
         self.db = create_engine(self.db_name)
         connection = self.db.connect()
         people_ = connection.execute("SELECT * FROM people")
@@ -189,5 +189,3 @@ class Database(object):
                     "<employee_id>": emp_id,
                     "<new_room_name>": table_name
                 })
-                print emp_id
-my_database = Database()
