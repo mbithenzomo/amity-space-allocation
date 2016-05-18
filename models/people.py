@@ -41,6 +41,7 @@ class StaffFromDatabase(Person):
     def __init__(self, is_fellow, first_name, last_name, emp_id):
         self.first_name = first_name
         self.last_name = last_name
+        self.name = self.first_name + " " + self.last_name
         self.emp_id = emp_id
 
     def __repr__(self):
@@ -54,6 +55,7 @@ class FellowFromDatabase(Person):
     def __init__(self, is_fellow, first_name, last_name, emp_id):
         self.first_name = first_name
         self.last_name = last_name
+        self.name = self.first_name + " " + self.last_name
         self.emp_id = emp_id
 
     def __repr__(self):

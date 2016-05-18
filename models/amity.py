@@ -171,7 +171,6 @@ class Amity(object):
     def add_person_from_db(self, args):
         """Add new person from an exsiting database"""
         print spacer
-        name = args["first_name"] + " " + args["last_name"]
         is_fellow = args["is_fellow"]
         first_name = args["first_name"]
         last_name = args["last_name"]
@@ -187,22 +186,13 @@ class Amity(object):
                 is_fellow, first_name, last_name, emp_id
             )
             self.staff.append(new_person)
-        self.success_added_person_from_db(name, new_person, wants_space)
+        self.success_added_person(new_person, wants_space)
         self.people.append(new_person)
 
     def success_added_person(self, new_person, wants_space):
         """Success message when person has been successfully added"""
         print "You have successfully added the following person:"
         print "Name: " + new_person.name + " | Employee ID: " + \
-            str(new_person.emp_id) + \
-            "\nJob Type: " + new_person.job_type + \
-            " | Wants Space?: " + wants_space
-        print spacer
-
-    def success_added_person_from_db(self, name, new_person, wants_space):
-        """Success message when person has been successfully added"""
-        print "You have successfully added the following person:"
-        print "Name: " + name + " | Employee ID: " + \
             str(new_person.emp_id) + \
             "\nJob Type: " + new_person.job_type + \
             " | Wants Space?: " + wants_space
