@@ -130,9 +130,7 @@ class TestRooms(unittest.TestCase):
         Test that people can be added to the app from a
         user-defined text file
         """
-        self.test_amity.load_people({
-            "": ""
-        })
+        self.test_amity.load_people({"<filename>": "people.txt"})
         # People from file are added to application
         # One fellow not added due to lack of vacancy in existing living space
         self.assertEqual(8, len(self.test_amity.people))

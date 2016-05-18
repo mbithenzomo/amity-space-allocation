@@ -112,7 +112,7 @@ class Interactive (cmd.Cmd):
 
     @docopt_cmd
     def do_load_people(self, args):
-        """Usage: load_people"""
+        """Usage: load_people <filename>"""
         my_amity.load_people(args)
 
     @docopt_cmd

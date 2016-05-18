@@ -1,7 +1,7 @@
 import random
 import tkFileDialog as tk
 from rooms import Office, Living
-from people import Staff, Fellow
+from people import Staff, Fellow, StaffFromDatabase, FellowFromDatabase
 from termcolor import colored
 
 spacer = " "
@@ -26,6 +26,32 @@ class Amity(object):
 
     def create_room(self, args):
         """Create new room(s)"""
+        print spacer
+        new_rooms = []
+        for room in args["<room_name>"]:
+            if room.lower() in [r.name.lower() for r in self.rooms]:
+                print "One or more rooms you tried to create already exist! " \
+                    "Please try again."
+                print spacer
+                return
+            if args["Office"]:
+                new_room = Office(room)
+                self.offices.append(new_room)
+                self.check_vacant_offices()
+            elif args["Living"]:
+                new_room = Living(room)
+                self.livingspaces.append(new_room)
+                self.check_vacant_livingspaces()
+            self.rooms.append(new_room)
+            new_rooms.append(new_room)
+        print "You have successfully added the following rooom(s):"
+        for new_room_ in new_rooms:
+            print "Name: " + ''.join(new_room_.name) + " | Type: " \
+                + new_room_.room_type
+        print spacer
+
+    def create_room_from_db(self, args):
+        """Create new room(s) from existing database"""
         print spacer
         new_rooms = []
         for room in args["<room_name>"]:
@@ -142,10 +168,41 @@ class Amity(object):
                 self.fellows.append(new_person)
         self.people.append(new_person)
 
+    def add_person_from_db(self, args):
+        """Add new person from an exsiting database"""
+        print spacer
+        name = args["first_name"] + " " + args["last_name"]
+        is_fellow = args["is_fellow"]
+        first_name = args["first_name"]
+        last_name = args["last_name"]
+        emp_id = args["emp_id"]
+        wants_space = "No"
+        if is_fellow:
+            new_person = FellowFromDatabase(
+                is_fellow, first_name, last_name, emp_id
+            )
+            self.fellows.append(new_person)
+        else:
+            new_person = StaffFromDatabase(
+                is_fellow, first_name, last_name, emp_id
+            )
+            self.staff.append(new_person)
+        self.success_added_person_from_db(name, new_person, wants_space)
+        self.people.append(new_person)
+
     def success_added_person(self, new_person, wants_space):
         """Success message when person has been successfully added"""
         print "You have successfully added the following person:"
         print "Name: " + new_person.name + " | Employee ID: " + \
+            str(new_person.emp_id) + \
+            "\nJob Type: " + new_person.job_type + \
+            " | Wants Space?: " + wants_space
+        print spacer
+
+    def success_added_person_from_db(self, name, new_person, wants_space):
+        """Success message when person has been successfully added"""
+        print "You have successfully added the following person:"
+        print "Name: " + name + " | Employee ID: " + \
             str(new_person.emp_id) + \
             "\nJob Type: " + new_person.job_type + \
             " | Wants Space?: " + wants_space
@@ -279,8 +336,8 @@ class Amity(object):
 
     def load_people(self, args):
         """Add people to rooms from a txt file"""
-        file = tk.askopenfile()
-        with open(file.name, 'r') as my_file:
+        filename = args["<filename>"]
+        with open(filename, 'r') as my_file:
             people = my_file.readlines()
             for p in people:
                 p = p.split()
