@@ -3,7 +3,7 @@ import os
 from models.amity import Amity
 
 
-class TestRooms(unittest.TestCase):
+class TestAmity(unittest.TestCase):
 
     def setUp(self):
         self.test_amity = Amity()
