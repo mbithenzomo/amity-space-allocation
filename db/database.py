@@ -9,6 +9,9 @@ class Database(object):
 
     already_added = []
 
+    def __init__(self):
+        self.db = None
+
     def save_state(self, args):
         """
         Save all application data to the database 'amity.db',
@@ -38,7 +41,8 @@ class Database(object):
         people = Table(
                 "people", self.metadata,
                 Column("employee_id", Integer, primary_key=True),
-                Column("name", String(80)),
+                Column("first_name", String(80)),
+                Column("last_name", String(80)),
                 Column("is_fellow", Boolean),
                 Column("is_allocated", Boolean),
                 extend_existing=True
@@ -58,9 +62,11 @@ class Database(object):
                     is_allocated = True
                 else:
                     is_allocated = False
+                first_name, last_name = person.name.split(" ")
                 i.execute(
                     employee_id=person.emp_id,
-                    name=person.name,
+                    first_name=first_name,
+                    last_name=last_name,
                     is_fellow=is_fellow,
                     is_allocated=is_allocated
                 )
@@ -127,6 +133,61 @@ class Database(object):
                         )
 
     def load_state(self, args):
-        pass
+        """Load data to the application from a user-defined database"""
+        self.db_name = "sqlite:///" + "%s" % (args["<sqlite_database>"])
+        self.db = create_engine(self.db_name)
+        connection = self.db.connect()
+        people_ = connection.execute("SELECT * FROM people")
+        rooms_ = connection.execute("SELECT * FROM rooms")
+        table_names = connection.execute(
+            "SELECT name FROM sqlite_master \
+            WHERE (type='table') AND (name NOT LIKE 'people') \
+            AND (name NOT LIKE 'rooms') "
+        )
 
+        for row in people_:
+            if row["is_fellow"]:
+                is_fellow = True
+            else:
+                is_fellow = False
+            first_name = row["first_name"]
+            last_name = row["last_name"]
+            emp_id = row["employee_id"]
+
+            my_amity.add_person_from_db({
+                    "is_fellow": is_fellow,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "is_fellow": is_fellow,
+                    "emp_id": emp_id
+                })
+
+        for row in rooms_:
+            name = row["name"]
+            if row["is_office"]:
+                is_office = True
+                is_living = False
+            else:
+                is_office = False
+                is_living = True
+
+            my_amity.create_room({
+                "<room_name>": [name],
+                "Living": [is_living],
+                "Office": [is_office]
+            })
+
+        for table_name in table_names:
+            table_name = str(table_name[0])
+            query = "SELECT * FROM %s" % table_name
+            room = connection.execute(query)
+            for row in room:
+                emp_id = row["employee_id"]
+                emp_id = str(emp_id)
+
+                my_amity.reallocate_person({
+                    "<employee_id>": emp_id,
+                    "<new_room_name>": table_name
+                })
+                print emp_id
 my_database = Database()
