@@ -26,7 +26,7 @@ class TestRooms(unittest.TestCase):
         self.livinga = self.test_amity.livingspaces[0]
         self.officea = self.test_amity.offices[0]
 
-        """Add fellows"""
+        """Add fellow that wants space"""
         self.test_amity.add_person({
             "<first_name>": "Test",
             "<last_name>": "Fellow",
@@ -35,7 +35,7 @@ class TestRooms(unittest.TestCase):
             "Staff": False
         })
 
-        """Add staff member"""
+        """Add staff member that wants space"""
         self.test_amity.add_person({
             "<first_name>": "Test",
             "<last_name>": "Staff",
@@ -104,20 +104,40 @@ class TestRooms(unittest.TestCase):
             "Living": True,
             "Office": False
         })
-
         # Assign LivingB to variable
         self.livingb = self.test_amity.livingspaces[1]
 
-        """Reallocate Test Fellow from LivingA to LivingB"""
+        """Test reallocation of Test Fellow from LivingA to LivingB"""
         self.test_amity.reallocate_person({
             "<employee_id>": int(self.testfellow.emp_id),
             "<new_room_name>": "LivingB"
         })
-
         # Fellow no longer in LivingA's list of occupants
         self.assertEqual(0, len(self.livinga.occupants))
         # Fellow now in LivingB's list of occupants
         self.assertEqual(1, len(self.livingb.occupants))
+
+        """Test that staff cannot be allocated to living space"""
+        self.test_amity.reallocate_person({
+            "<employee_id>": int(self.teststaff.emp_id),
+            "<new_room_name>": "LivingB"
+        })
+        # Staff not added to LivingB's list of occupants
+        self.assertEqual(1, len(self.livingb.occupants))
+
+    def test_load_people(self):
+        """
+        Test that people can be added to the app from a
+        user-defined text file
+        """
+        self.test_amity.load_people({
+            "": ""
+        })
+        # People from file are added to application
+        # One fellow not added due to lack of vacancy in existing living space
+        self.assertEqual(8, len(self.test_amity.people))
+        self.assertEqual(4, len(self.test_amity.fellows))
+        self.assertEqual(4, len(self.test_amity.staff))
 
     def test_print_allocations(self):
         """
@@ -129,3 +149,36 @@ class TestRooms(unittest.TestCase):
         })
         # File is created
         self.assertTrue(os.path.exists("myfile.txt"))
+        # Data is entered
+        with open("myfile.txt") as myfile:
+            lines = myfile.readlines()
+            self.assertTrue("LivingA\n" in lines)
+            self.assertTrue("OfficeA\n" in lines)
+            self.assertTrue("Test Fellow\n" in lines)
+            self.assertTrue("Test Staff\n" in lines)
+        os.remove("myfile.txt")
+
+    def test_print_unallocated(self):
+        """
+        Test that unallocated people are displayed on screen
+        and printed to a text file if specified
+        """
+        # Add fellow that does not want space
+        self.test_amity.add_person({
+            "<first_name>": "Test",
+            "<last_name>": "Fellow2",
+            "<wants_space>": "N",
+            "Fellow": True,
+            "Staff": False
+        })
+        self.test_amity.print_unallocated({
+            "--o": "myfile2.txt"
+        })
+        # File is created
+        self.assertTrue(os.path.exists("myfile2.txt"))
+        # Data is entered
+        with open("myfile2.txt") as myfile:
+            lines = myfile.readlines()
+            self.assertTrue("Unallocated People\n" in lines)
+            self.assertTrue("Test Fellow2\n" in lines)
+        os.remove("myfile2.txt")
