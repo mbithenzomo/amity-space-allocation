@@ -1,5 +1,4 @@
 import random
-import tkFileDialog as tk
 from rooms import Office, Living
 from people import Staff, Fellow, StaffFromDatabase, FellowFromDatabase
 from termcolor import colored

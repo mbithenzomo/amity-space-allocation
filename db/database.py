@@ -1,4 +1,3 @@
-from models import my_amity
 from models.amity import spacer
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData, Column, Table
@@ -9,8 +8,9 @@ class Database(object):
 
     already_added = []
 
-    def __init__(self):
+    def __init__(self, my_amity):
         self.db = None
+        self.my_amity = my_amity
 
     def save_state(self, args):
         """
@@ -52,13 +52,13 @@ class Database(object):
         else:
             people.create()
         i = people.insert()
-        for person in my_amity.people:
+        for person in self.my_amity.people:
             if person not in self.already_added:
                 if person.job_type == "Fellow":
                     is_fellow = True
                 else:
                     is_fellow = False
-                if person in my_amity.allocated_people:
+                if person in self.my_amity.allocated_people:
                     is_allocated = True
                 else:
                     is_allocated = False
@@ -86,13 +86,13 @@ class Database(object):
         else:
             rooms.create()
         i = rooms.insert()
-        for room in my_amity.rooms:
+        for room in self.my_amity.rooms:
             if room not in self.already_added:
                 if room.room_type == "Office":
                     is_office = True
                 else:
                     is_office = False
-                if room in my_amity.vacant_rooms:
+                if room in self.my_amity.vacant_rooms:
                     is_vacant = True
                 else:
                     is_vacant = False
@@ -108,8 +108,8 @@ class Database(object):
         Add data from the Allocations list to the database.
         Each room gets a database table with occupants as rows.
         """
-        if my_amity.rooms:
-            for room in my_amity.rooms:
+        if self.my_amity.rooms:
+            for room in self.my_amity.rooms:
                 room_name = room.name
                 room_name = Table(
                         room_name, self.metadata,
@@ -132,7 +132,7 @@ class Database(object):
                             name=person.name
                         )
 
-    def load_state(self, args):
+    def load_state(self, args):  # pragma: no cover
         """Load data to the application from a user-defined database"""
         self.db_name = "sqlite:///" + "%s" % args.get("<sqlite_database>")
         self.db = create_engine(self.db_name)
@@ -146,6 +146,7 @@ class Database(object):
         )
 
         for row in people_:
+            print('people in load_state', people_)
             if row["is_fellow"]:
                 is_fellow = True
             else:
@@ -154,7 +155,7 @@ class Database(object):
             last_name = row["last_name"]
             emp_id = row["employee_id"]
 
-            my_amity.add_person_from_db({
+            self.my_amity.add_person_from_db({
                     "is_fellow": is_fellow,
                     "first_name": first_name,
                     "last_name": last_name,
@@ -171,7 +172,7 @@ class Database(object):
                 is_office = False
                 is_living = True
 
-            my_amity.create_room({
+            self.my_amity.create_room({
                 "<room_name>": [name],
                 "Living": [is_living],
                 "Office": [is_office]
@@ -185,7 +186,7 @@ class Database(object):
                 emp_id = row["employee_id"]
                 emp_id = str(emp_id)
 
-                my_amity.reallocate_person({
+                self.my_amity.reallocate_person({
                     "<employee_id>": emp_id,
                     "<new_room_name>": table_name
                 })

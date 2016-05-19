@@ -25,9 +25,11 @@ from pyfiglet import figlet_format
 from docopt import docopt, DocoptExit
 from models import my_amity
 from models.amity import spacer, border
-from db import my_database
+from db.database import Database
 from colorama import init
 init(strip=not sys.stdout.isatty())
+
+my_database = Database(my_amity)
 
 
 def docopt_cmd(func):

@@ -83,7 +83,6 @@ class TestAmity(unittest.TestCase):
         # Duplicate rooms not added to any list
         self.assertEqual(6, len(self.test_amity.rooms))
         self.assertEqual(3, len(self.test_amity.offices))
-        # Error message displayed
 
     def test_add_person(self):
         """Test addition of people"""
@@ -97,6 +96,21 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(1, len(self.livinga.occupants))
         self.assertEqual(1, len(self.officea.occupants))
 
+    def test_vacant_offices(self):
+        """Test that vacant rooms are added to relevant list"""
+        # Add office
+        self.test_amity.create_room({
+            "<room_name>": ["OfficeB"],
+            "Living": False,
+            "Office": True
+        })
+
+        self.test_amity.check_vacant_offices()
+
+        # Check if OfficeB has been appended to relevant lists
+        self.assertEqual(2, len(self.test_amity.vacant_offices))
+        self.assertEqual(3, len(self.test_amity.vacant_rooms))
+
     def test_reallocate_person(self):
         """Add another living space"""
         self.test_amity.create_room({
@@ -105,7 +119,7 @@ class TestAmity(unittest.TestCase):
             "Office": False
         })
         # Assign LivingB to variable
-        self.livingb = self.test_amity.livingspaces[1]
+        livingb = self.test_amity.livingspaces[1]
 
         """Test reallocation of Test Fellow from LivingA to LivingB"""
         self.test_amity.reallocate_person({
@@ -115,7 +129,7 @@ class TestAmity(unittest.TestCase):
         # Fellow no longer in LivingA's list of occupants
         self.assertEqual(0, len(self.livinga.occupants))
         # Fellow now in LivingB's list of occupants
-        self.assertEqual(1, len(self.livingb.occupants))
+        self.assertEqual(1, len(livingb.occupants))
 
         """Test that staff cannot be allocated to living space"""
         self.test_amity.reallocate_person({
@@ -123,7 +137,7 @@ class TestAmity(unittest.TestCase):
             "<new_room_name>": "LivingB"
         })
         # Staff not added to LivingB's list of occupants
-        self.assertEqual(1, len(self.livingb.occupants))
+        self.assertEqual(1, len(livingb.occupants))
 
     def test_load_people(self):
         """
