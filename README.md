@@ -37,7 +37,7 @@ Run ```python app.py -i```
 
 3. ```reallocate_person <employee_id> <new_room_name>``` Using this command, you can allocate an already allocated person another room, or allocate a previously unallocated person a room. You must specify the person's employee ID as well as the room to be allocated. Note that staff members cannot be allocated living spaces, while fellows can be allocated offices using this command. Example: ```reallocate_person 123456 Hogwarts```
 
-4. ```load_people <filename>``` This command opens your computer's file explorer for you to select a text file containing people's information. The people are then added to the system. See ```people.txt``` for sample data.
+4. ```load_people <filename>``` This command allows the user to specify a text file containing people's information. The people are then added to the system. See ```people.txt``` for sample data.
 
 5. ```print_allocations [--o=filename]``` Print a list of occupants per room to the screen, and optionally to a text file.
 
