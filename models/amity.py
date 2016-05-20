@@ -168,7 +168,7 @@ class Amity(object):
         self.people.append(new_person)
 
     def add_person_from_db(self, args):
-        """Add new person from an exsiting database"""
+        """Add new person from an existing database"""
         print spacer
         is_fellow = args["is_fellow"]
         first_name = args["first_name"]
@@ -201,20 +201,21 @@ class Amity(object):
         """(Re)allocate person to (another) room"""
         print spacer
         emp_id = int(args["<employee_id>"])
+        new_person = None
+        """Check that employee ID entered exists"""
         for p in self.people:
             if p.emp_id == emp_id:
                 new_person = p
-        new_room_name = args["<new_room_name>"]
-        for r in self.rooms:
-            if r.name == new_room_name:
-                new_room = r
-
-        """Check that employee ID entered exists"""
-        if emp_id not in [p.emp_id for p in self.people]:
+        if new_person is None:
             print "The employee ID you have entered does not exist."
             print "Please try again."
             print spacer
             return
+
+        new_room_name = args["<new_room_name>"]
+        for r in self.rooms:
+            if r.name == new_room_name:
+                new_room = r
 
         """Check that room entered exists"""
         if new_room_name not in [r.name for r in self.rooms]:
