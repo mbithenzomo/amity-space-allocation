@@ -51,7 +51,7 @@ class Database(object):
             people.update()
         else:
             people.create()
-        i = people.insert()
+        insert = people.insert()
         for person in self.my_amity.people:
             if person not in self.already_added:
                 if person.job_type == "Fellow":
@@ -63,7 +63,7 @@ class Database(object):
                 else:
                     is_allocated = False
                 first_name, last_name = person.name.split(" ")
-                i.execute(
+                insert.execute(
                     employee_id=person.emp_id,
                     first_name=first_name,
                     last_name=last_name,
@@ -85,7 +85,7 @@ class Database(object):
             rooms.update()
         else:
             rooms.create()
-        i = rooms.insert()
+        insert = rooms.insert()
         for room in self.my_amity.rooms:
             if room not in self.already_added:
                 if room.room_type == "Office":
@@ -96,7 +96,7 @@ class Database(object):
                     is_vacant = True
                 else:
                     is_vacant = False
-                i.execute(
+                insert.execute(
                     name=room.name,
                     is_office=is_office,
                     is_vacant=is_vacant
@@ -124,10 +124,10 @@ class Database(object):
                     room_name.update()
                 else:
                     room_name.create()
-                i = room_name.insert()
+                insert = room_name.insert()
                 if room.occupants:
                     for person in room.occupants:
-                        i.execute(
+                        insert.execute(
                             employee_id=person.emp_id,
                             name=person.name
                         )
@@ -137,16 +137,16 @@ class Database(object):
         self.db_name = "sqlite:///" + "%s" % args.get("<sqlite_database>")
         self.db = create_engine(self.db_name)
         connection = self.db.connect()
-        people_ = connection.execute("SELECT * FROM people")
-        rooms_ = connection.execute("SELECT * FROM rooms")
+        people = connection.execute("SELECT * FROM people")
+        rooms = connection.execute("SELECT * FROM rooms")
         table_names = connection.execute(
             "SELECT name FROM sqlite_master \
             WHERE (type='table') AND (name NOT LIKE 'people') \
             AND (name NOT LIKE 'rooms') "
         )
 
-        for row in people_:
-            print('people in load_state', people_)
+        for row in people:
+            print('people in load_state', people)
             if row["is_fellow"]:
                 is_fellow = True
             else:
@@ -159,11 +159,10 @@ class Database(object):
                     "is_fellow": is_fellow,
                     "first_name": first_name,
                     "last_name": last_name,
-                    "is_fellow": is_fellow,
                     "emp_id": emp_id
                 })
 
-        for row in rooms_:
+        for row in rooms:
             name = row["name"]
             if row["is_office"]:
                 is_office = True
