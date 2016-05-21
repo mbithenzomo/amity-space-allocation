@@ -119,27 +119,6 @@ class Amity(object):
         self.people.append(new_person)
         self.success_added_person(new_person, wants_space)
 
-    def add_person_from_db(self, args):
-        """Add new person from an existing database"""
-        print spacer
-        is_fellow = args["is_fellow"]
-        first_name = args["first_name"]
-        last_name = args["last_name"]
-        emp_id = args["emp_id"]
-        wants_space = "No"
-        if is_fellow:
-            new_person = FellowFromDatabase(
-                is_fellow, first_name, last_name, emp_id
-            )
-            self.fellows.append(new_person)
-        else:
-            new_person = StaffFromDatabase(
-                is_fellow, first_name, last_name, emp_id
-            )
-            self.staff.append(new_person)
-        self.success_added_person(new_person, wants_space)
-        self.people.append(new_person)
-
     def success_added_person(self, new_person, wants_space):
         """Success message when person has been successfully added"""
         print "You have successfully added the following person:"
