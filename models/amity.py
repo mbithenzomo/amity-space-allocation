@@ -36,11 +36,10 @@ class Amity(object):
             if args["Office"]:
                 new_room = Office(room)
                 self.offices.append(new_room)
-                self.check_vacant_offices()
             elif args["Living"]:
                 new_room = Living(room)
                 self.livingspaces.append(new_room)
-                self.check_vacant_livingspaces()
+            self.check_vacant_rooms()
             self.rooms.append(new_room)
             new_rooms.append(new_room)
         print "You have successfully added the following rooom(s):"
@@ -49,8 +48,8 @@ class Amity(object):
                 + new_room_.room_type
         print spacer
 
-    def check_vacant_offices(self):
-        """Add vacant offices to lists; remove full ones from lists"""
+    def check_vacant_rooms(self):
+        """Add vacant rooms to lists; remove full ones from lists"""
         for office in self.offices:
             if len(office.occupants) < office.capacity:
                 if office not in self.vacant_offices:
@@ -60,9 +59,6 @@ class Amity(object):
                 if office in self.vacant_offices:
                     self.vacant_offices.remove(office)
                     self.vacant_rooms.remove(office)
-
-    def check_vacant_livingspaces(self):
-        """Add vacant living spaces to lists; remove full ones from lists"""
         for livingspace in self.livingspaces:
             if len(livingspace.occupants) < livingspace.capacity:
                 if livingspace not in self.vacant_livingspaces:
@@ -78,68 +74,50 @@ class Amity(object):
         print spacer
         name = args["<first_name>"] + " " + args["<last_name>"]
         wants_space = "Yes" if args.get("<wants_space>") is "Y" else "No"
-        if args["Staff"]:
-            if wants_space == "Yes":
-                if self.offices:
-                    self.check_vacant_offices()
-                    if not self.vacant_offices:
-                        print "There are no vacant offices at this time."
-                        print "Please try again later."
-                        print spacer
-                        return
+        if wants_space == "No":
+            if args["Staff"]:
+                new_person = Staff(name)
+                self.staff.append(new_person)
+            elif args["Fellow"]:
+                new_person = Fellow(name)
+                self.fellows.append(new_person)
+        else:
+            if self.offices:
+                self.check_vacant_rooms()
+                if not self.vacant_offices:
+                    print "There are no vacant offices at this time."
+                    print "Please try again later."
+                    print spacer
+                    return
+                if args["Staff"]:
                     office_choice = random.choice(self.vacant_offices)
                     new_person = Staff(name)
                     office_choice.occupants.append(new_person)
                     self.staff.append(new_person)
                     self.allocated_staff.append(new_person)
-                    self.allocated_people.append(new_person)
-                    self.success_added_person(new_person, wants_space)
                     print "You have successfully allocated " + name + \
                         " of Employee ID " + str(new_person.emp_id) + \
                         "\nthe following office: " + office_choice.name
                     print spacer
-                else:
-                    print "There are no offices in the system."
-                    print "Add an office using the create_room command " \
-                        "and try again."
-                    print spacer
-                    return
-            else:
-                new_person = Staff(name)
-                self.success_added_person(new_person, wants_space)
-                self.staff.append(new_person)
-        elif args["Fellow"]:
-            if wants_space == "Yes":
-                if self.livingspaces:
-                    self.check_vacant_livingspaces()
-                    if not self.vacant_livingspaces:
-                        print "There are no vacant living spaces at this time."
-                        print "Please try again later."
-                        print spacer
-                        return
-                    living_choice = random.choice(self.vacant_livingspaces)
+                elif args["Fellow"]:
+                    office_choice = random.choice(self.vacant_offices)
                     new_person = Fellow(name)
-                    living_choice.occupants.append(new_person)
+                    office_choice.occupants.append(new_person)
                     self.fellows.append(new_person)
                     self.allocated_fellows.append(new_person)
-                    self.allocated_people.append(new_person)
-                    self.success_added_person(new_person, wants_space)
                     print "You have successfully allocated " + name + \
                         " of Employee ID " + str(new_person.emp_id) + \
-                        "\nthe following living space: " + \
-                        living_choice.name
+                        "\nthe following office: " + office_choice.name
                     print spacer
-                else:
-                    print "There are no living spaces in the system."
-                    print "Add a living space using the create_room command " \
-                        "and try again."
-                    print spacer
-                    return
+                self.allocated_people.append(new_person)
             else:
-                new_person = Fellow(name)
-                self.success_added_person(new_person, wants_space)
-                self.fellows.append(new_person)
+                print "There are no offices in the system."
+                print "Add one using the create_room command " \
+                    "and try again."
+                print spacer
+                return
         self.people.append(new_person)
+        self.success_added_person(new_person, wants_space)
 
     def add_person_from_db(self, args):
         """Add new person from an existing database"""
@@ -172,10 +150,14 @@ class Amity(object):
         print spacer
 
     def reallocate_person(self, args):
-        """(Re)allocate person to (another) room"""
+        """
+        Reallocate person to another office or
+        (re)allocate fellow to (another) living space
+        """
         print spacer
         emp_id = int(args["<employee_id>"])
         new_person = None
+
         """Check that employee ID entered exists"""
         for p in self.people:
             if p.emp_id == emp_id:
@@ -191,18 +173,11 @@ class Amity(object):
             if r.name == new_room_name:
                 new_room = r
 
-        """Check that room entered exists"""
-        if new_room_name not in [r.name for r in self.rooms]:
-            print "The room you have entered does not exist."
-            print "Please try again."
-            print spacer
-            return
-
-        """Check that room entered is vacant"""
+        """Check that room entered exists and is vacant"""
         if new_room_name not in [r.name for r in self.vacant_rooms]:
             print "The room you entered, " + new_room_name + \
-                ", is not vacant at this time."
-            print "Please try again later."
+                "either does not exist or is not vacant."
+            print "Please try again."
             print spacer
             return
 
@@ -213,87 +188,33 @@ class Amity(object):
                     "living spaces."
                 print spacer
                 return
-            else:
-                """
-                Check if staff member has already been allocated an office
-                """
-                for office in self.vacant_offices:
-                    if new_person.emp_id in \
-                            [person.emp_id for person in office.occupants]:
-                        if new_room == office:
-                            """
-                            Prevent staff member from being allocated \
-                            the same office
-                            """
-                            print new_person.name + " is already an occupant" \
-                                " of the office " + new_room.name + "."
-                            print spacer
-                            return
-                        else:
-                            """Remove staff member from current office"""
-                            office.occupants.remove(new_person)
-                """Add staff member to new office"""
-                new_room.occupants.append(new_person)
-                self.allocated_staff.append(new_person)
-                self.allocated_people.append(new_person)
-                print "You have successfully allocated " + new_person.name + \
-                    " of Employee ID " + str(new_person.emp_id) + \
-                    "\nthe following office: " + new_room.name
 
-        elif new_person.job_type == "Fellow":
-            if new_room.room_type == "Office":
-                """
-                Check if fellow has already been allocated an office
-                """
-                for office in self.vacant_offices:
-                    if new_person.emp_id in \
-                            [person.emp_id for person in office.occupants]:
-                        if new_room == office:
-                            """
-                            Prevent fellow from being allocated \
-                            the same office
-                            """
-                            print new_person.name + " is already an occupant" \
-                                " of the office " + new_room.name + "."
-                            print spacer
-                            return
-                        else:
-                            """Remove fellow from current office"""
-                            office.occupants.remove(new_person)
-                """Add fellow to new office"""
-                new_room.occupants.append(new_person)
-                self.allocated_fellows.append(new_person)
-                self.allocated_people.append(new_person)
-                print "You have successfully allocated " + new_person.name + \
-                    " of Employee ID " + str(new_person.emp_id) + \
-                    "\nthe following office: " + new_room.name
-            elif new_room.room_type == "Living":
-                """
-                Check if fellow has already been allocated a living space
-                """
-                for livingspace in self.vacant_livingspaces:
-                    if new_person.emp_id in \
-                            [person.emp_id for person
-                                in livingspace.occupants]:
-                        if new_room == livingspace:
-                            """
-                            Prevent fellow from being allocated \
-                            the same living space
-                            """
-                            print new_person.name + " is already an occupant" \
-                                " of the living space " + new_room.name + "."
-                            print spacer
-                            return
-                        else:
-                            """Remove fellow from current living space"""
-                            livingspace.occupants.remove(new_person)
-                """Add fellow to new living space"""
-                new_room.occupants.append(new_person)
-                self.allocated_fellows.append(new_person)
-                self.allocated_people.append(new_person)
-                print "You have successfully allocated " + new_person.name + \
-                    " of Employee ID " + str(new_person.emp_id) + \
-                    "\nthe following living space: " + new_room.name
+        """Check if person has already been allocated a room"""
+        for room in self.vacant_rooms:
+            if new_person.emp_id in \
+                    [person.emp_id for person in room.occupants]:
+                if new_room == room:
+                    """
+                    Prevent person from being allocated the same room
+                    """
+                    print new_person.name + " is already an occupant" \
+                        " of the room " + new_room.name + "."
+                    print spacer
+                    return
+                else:
+                    """Remove person from current office"""
+                    room.occupants.remove(new_person)
+
+        """Add person to new room"""
+        new_room.occupants.append(new_person)
+        self.allocated_people.append(new_person)
+        if new_person.job_type == "Fellow":
+            self.allocated_fellows.append(new_person)
+        else:
+            self.allocated_staff.append(new_person)
+        print "You have successfully allocated " + new_person.name + \
+            " of Employee ID " + str(new_person.emp_id) + \
+            "\nthe following room: " + new_room.name
         if new_person in self.unallocated_people:
             self.unallocated_people.remove(new_person)
         print spacer
