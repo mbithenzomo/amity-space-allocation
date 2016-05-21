@@ -1,6 +1,6 @@
 import random
 from rooms import Office, Living
-from people import Staff, Fellow, StaffFromDatabase, FellowFromDatabase
+from people import Staff, Fellow
 from termcolor import colored
 
 spacer = " "
