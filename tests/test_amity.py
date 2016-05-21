@@ -93,8 +93,7 @@ class TestAmity(unittest.TestCase):
 
         """Test allocation of those who want space"""
         # Check that people have been appended to rooms' lists of occupants
-        self.assertEqual(1, len(self.livinga.occupants))
-        self.assertEqual(1, len(self.officea.occupants))
+        self.assertEqual(2, len(self.officea.occupants))
 
     def test_vacant_offices(self):
         """Test that vacant rooms are added to relevant list"""
@@ -105,13 +104,32 @@ class TestAmity(unittest.TestCase):
             "Office": True
         })
 
-        self.test_amity.check_vacant_offices()
+        self.test_amity.check_vacant_rooms()
 
         # Check if OfficeB has been appended to relevant lists
         self.assertEqual(2, len(self.test_amity.vacant_offices))
         self.assertEqual(3, len(self.test_amity.vacant_rooms))
 
     def test_reallocate_person(self):
+        """Add another office"""
+        self.test_amity.create_room({
+            "<room_name>": ["OfficeB"],
+            "Living": False,
+            "Office": True
+        })
+        # Assign OfficeB to variable
+        officeb = self.test_amity.offices[1]
+
+        """Test reallocation of Test Staff from OfficeA to OfficeB"""
+        self.test_amity.reallocate_person({
+            "<employee_id>": int(self.teststaff.emp_id),
+            "<new_room_name>": "OfficeB"
+        })
+        # Staff member no longer in OfficeA's list of occupants
+        self.assertEqual(1, len(self.officea.occupants))
+        # Staff member now in OfficeB's list of occupants
+        self.assertEqual(1, len(officeb.occupants))
+
         """Add another living space"""
         self.test_amity.create_room({
             "<room_name>": ["LivingB"],
@@ -121,13 +139,11 @@ class TestAmity(unittest.TestCase):
         # Assign LivingB to variable
         livingb = self.test_amity.livingspaces[1]
 
-        """Test reallocation of Test Fellow from LivingA to LivingB"""
+        """Test allocation of Test Fellow to LivingB"""
         self.test_amity.reallocate_person({
             "<employee_id>": int(self.testfellow.emp_id),
             "<new_room_name>": "LivingB"
         })
-        # Fellow no longer in LivingA's list of occupants
-        self.assertEqual(0, len(self.livinga.occupants))
         # Fellow now in LivingB's list of occupants
         self.assertEqual(1, len(livingb.occupants))
 
@@ -144,12 +160,19 @@ class TestAmity(unittest.TestCase):
         Test that people can be added to the app from a
         user-defined text file
         """
+
+        """Add office to have more vacant offices for people from text file """
+        self.test_amity.create_room({
+            "<room_name>": ["OfficeC"],
+            "Living": False,
+            "Office": True
+        })
+
         self.test_amity.load_people({"<filename>": "people.txt"})
         # People from file are added to application
-        # One fellow not added due to lack of vacancy in existing living space
-        self.assertEqual(8, len(self.test_amity.people))
-        self.assertEqual(4, len(self.test_amity.fellows))
-        self.assertEqual(4, len(self.test_amity.staff))
+        self.assertEqual(12, len(self.test_amity.people))
+        self.assertEqual(7, len(self.test_amity.fellows))
+        self.assertEqual(5, len(self.test_amity.staff))
 
     def test_print_allocations(self):
         """
@@ -166,8 +189,7 @@ class TestAmity(unittest.TestCase):
             lines = myfile.readlines()
             self.assertTrue("LivingA\n" in lines)
             self.assertTrue("OfficeA\n" in lines)
-            self.assertTrue("Test Fellow\n" in lines)
-            self.assertTrue("Test Staff\n" in lines)
+            self.assertTrue("Test Fellow, Test Staff\n" in lines)
         os.remove("myfile.txt")
 
     def test_print_unallocated(self):
