@@ -49,32 +49,6 @@ class Amity(object):
                 + new_room_.room_type
         print spacer
 
-    def create_room_from_db(self, args):
-        """Create new room(s) from existing database"""
-        print spacer
-        new_rooms = []
-        for room in args["<room_name>"]:
-            if room.lower() in [r.name.lower() for r in self.rooms]:
-                print "One or more rooms you tried to create already exist! " \
-                    "Please try again."
-                print spacer
-                return
-            if args["Office"]:
-                new_room = Office(room)
-                self.offices.append(new_room)
-                self.check_vacant_offices()
-            elif args["Living"]:
-                new_room = Living(room)
-                self.livingspaces.append(new_room)
-                self.check_vacant_livingspaces()
-            self.rooms.append(new_room)
-            new_rooms.append(new_room)
-        print "You have successfully added the following rooom(s):"
-        for new_room_ in new_rooms:
-            print "Name: " + ''.join(new_room_.name) + " | Type: " \
-                + new_room_.room_type
-        print spacer
-
     def check_vacant_offices(self):
         """Add vacant offices to lists; remove full ones from lists"""
         for office in self.offices:
