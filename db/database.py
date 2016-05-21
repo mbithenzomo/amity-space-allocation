@@ -147,13 +147,25 @@ class Database(object):
 
         for row in people:
             print('people in load_state', people)
+            if row["is_fellow"]:
+                is_fellow = True
+                is_staff = False
+            else:
+                is_fellow = False
+                is_staff = True
 
-            self.my_amity.add_person_from_db({
-                    "is_fellow": row["is_fellow"],
-                    "first_name": row["first_name"],
-                    "last_name": row["last_name"],
-                    "emp_id": row["employee_id"]
+            self.my_amity.add_person({
+                    "<first_name>": row["first_name"],
+                    "<last_name>": row["last_name"],
+                    "<wants_space>": "N",
+                    "Fellow": is_fellow,
+                    "Staff": is_staff
                 })
+
+            # Change emp_id to what is in the database
+            employee_id = row["employee_id"]
+            person_from_db = self.my_amity.people[-1]
+            person_from_db.emp_id = employee_id
 
         for row in rooms:
             if row["is_office"]:
